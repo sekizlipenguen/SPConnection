@@ -15,20 +15,14 @@ npm install @sekizlipenguen/connection
 
 ```js
 
-const connection = require('@sekizlipenguen/connection');
+import connection from "@sekizlipenguen/connection";
+//or const connection = require('@sekizlipenguen/connection');
 
-connection.get('https://penguin.example.com?p=1&d=1')
-    .then(function (response) {
-        // handle success
-        console.log(response);
-    })
-    .catch(function (error) {
-        // handle error
-        console.log(error);
-    })
-    .then(function () {
-        // always executed
-    });
+connection.get('https://mocki.io/v1/8cecbd39-4cde-448f-9149-bccae2b66a0c').then((response) => {
+    console.log(response);
+}).catch((error) => {
+    console.log(error);
+});
 
 //example `async`
 async function getPenguin() {
@@ -42,11 +36,42 @@ async function getPenguin() {
 
 ```
 
+### Performing a `POST` request
+
+```js
+
+connection.post('https://mocki.io/v1/8cecbd39-4cde-448f-9149-bccae2b66a0c', {
+    first_name: 'CM',
+    last_name: 'Penguen'
+}).then((response) => {
+    console.log(response);
+}).catch((error) => {
+    console.log(error);
+});
+
+```
+
 ### Methods
 
-| Method Name | Description |
-|-------------|------------|
-| get         | -          |
-| post        | -          |
-| put         | -          |
-| delete      | -          |
+| Method Name            | Description |
+|------------------------|-------------|
+| get(url,config)        |             |
+| post(url,data,config)  |             |
+| put(url, data, config) |             |
+| delete(url, config)    |             |
+
+### Config
+
+```object
+{
+    headers: {
+        "content-type": "application/json",
+        "X-Custom-Header": "foobar"
+    },
+    progress: function (e) {
+        //post-put data upload event
+    },
+    timeout: "default 5000 ms",
+    async:"default true"
+}
+```
