@@ -1,7 +1,3 @@
-import SPConnection from "SPConnection";
+declare module "@sekizlipenguen/connection" {
 
-declare module '@sekizlipenguen/connection' {
-    export {
-        SPConnection
-    }
 }
