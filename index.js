@@ -1,5 +1,4 @@
 const timeout = 5000;
-
 const initProps = (defaultInit, config) => {
     return Object.assign({}, defaultInit, config);
 }
@@ -17,7 +16,6 @@ const isObject = (v) => {
 const connect = (url, data = {}, config = {}) => {
 
     let body = (isObject(data) && config.files !== true) ? JSON.stringify(data) : data;
-
     const defaultInit = {
         method: 'GET',
         timeout: timeout,
@@ -76,9 +74,7 @@ const connect = (url, data = {}, config = {}) => {
 class connection {
 
     static get(url, config) {
-        const defaultInit = {
-            method: 'GET',
-        };
+        const defaultInit = {method: 'GET'};
         const init = initProps(defaultInit, config);
         return connect(url, init.data, init);
     }
@@ -86,10 +82,7 @@ class connection {
     static post(url, data, config) {
         const isData = typeof data;
         const body = isData === 'object' ? JSON.stringify(data) : data;
-        const defaultInit = {
-            method: 'POST',
-            body: body,
-        };
+        const defaultInit = {method: 'POST', body: body};
         const init = initProps(defaultInit, config);
         return connect(url, data, init);
     }
@@ -97,23 +90,24 @@ class connection {
     static put(url, data, config) {
         const isData = typeof data;
         const body = isData === 'object' ? JSON.stringify(data) : data;
-        const defaultInit = {
-            method: 'PUT',
-            body: body,
-            timeout: timeout,
-        };
+        const defaultInit = {method: 'PUT', body: body};
+        const init = initProps(defaultInit, config);
+        return connect(url, data, init);
+    }
+
+    static patch(url, data, config) {
+        const isData = typeof data;
+        const body = isData === 'object' ? JSON.stringify(data) : data;
+        const defaultInit = {method: 'PATCH', body: body,};
         const init = initProps(defaultInit, config);
         return connect(url, data, init);
     }
 
     static delete(url, config) {
-        const defaultInit = {
-            method: 'DELETE',
-            timeout: timeout,
-        };
+        const defaultInit = {method: 'DELETE'};
         const init = initProps(defaultInit, config);
         return connect(url, init.data, init);
     }
-};
+}
 
 export default connection;

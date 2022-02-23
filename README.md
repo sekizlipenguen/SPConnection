@@ -53,12 +53,13 @@ connection.post('https://mocki.io/v1/8cecbd39-4cde-448f-9149-bccae2b66a0c', {
 
 ### Methods
 
-| Method Name            | Description |
-|------------------------|-------------|
-| get(url,config)        |             |
-| post(url,data,config)  |             |
-| put(url, data, config) |             |
-| delete(url, config)    |             |
+| Method Name              | Description |
+|--------------------------|-------------|
+| get(url,config)          |             |
+| post(url,data, config)   |             |
+| put(url, data, config)   |             |
+| patch(url, data, config) |             |
+| delete(url, config)      |             |
 
 ### Config
 
