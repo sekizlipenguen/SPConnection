@@ -51,9 +51,17 @@ const connect = (url, data = {}, config = {}) => {
                 result = JSON.parse(request.response);
             }
             if (request.status >= 200 && request.status < 300) {
-                resolve(result);
+                resolve({
+                    data: result,
+                    request: request,
+                    statusCode: request.status
+                });
             } else {
-                reject(result);
+                reject({
+                    data: result,
+                    request: request,
+                    statusCode: request.status
+                });
             }
         };
 
