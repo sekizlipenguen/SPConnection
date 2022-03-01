@@ -3,6 +3,12 @@
 [![npm](https://img.shields.io/npm/dm/@sekizlipenguen/connection.svg?style=flat-square&colorB=007ec6)](https://www.npmjs.com/package/@sekizlipenguen/connection)
 
 > Promise based HTTP client for the browser and react, react-native
+
+### Release notes(0.1.0) 🐧 🐐
+
+- global setConfig method
+- response timeout(status code) 408 added
+
 ## Installation
 
 ```
@@ -45,6 +51,7 @@ connection.post('https://mocki.io/v1/8cecbd39-4cde-448f-9149-bccae2b66a0c', {
     last_name: 'Penguen'
 }).then((response) => {
     console.log(response);
+
 }).catch((error) => {
     console.log(error);
 });
@@ -60,6 +67,14 @@ connection.post('https://mocki.io/v1/8cecbd39-4cde-448f-9149-bccae2b66a0c', {
 | put(url, data, config)   |             |
 | patch(url, data, config) |             |
 | delete(url, config)      |             |
+
+### Global Config
+
+```js
+connection.setConfig({
+    timeout: 6000 //ms
+})
+```
 
 ### Config
 

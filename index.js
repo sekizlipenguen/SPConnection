@@ -1,4 +1,4 @@
-const timeout = 5000;
+let timeout = 5000;
 const initProps = (defaultInit, config) => {
     return Object.assign({}, defaultInit, config);
 }
@@ -16,13 +16,7 @@ const isObject = (v) => {
 const connect = (url, data = {}, config = {}) => {
 
     let body = (isObject(data) && config.files !== true) ? JSON.stringify(data) : data;
-    const defaultInit = {
-        method: 'GET',
-        timeout: timeout,
-        progress: null,
-        headers: {},
-        async: true
-    };
+    const defaultInit = {method: 'GET', timeout: timeout, progress: null, headers: {}, async: true};
     const init = initProps(defaultInit, config);
     return new Promise((resolve, reject) => {
 
@@ -38,8 +32,13 @@ const connect = (url, data = {}, config = {}) => {
             }
         });
 
+        request.ontimeout = function () {
+            request['isTimeout'] = true
+        }
+
         request.onreadystatechange = (e) => {
             const responseHeaders = request && request.responseHeaders ? request.responseHeaders : null;
+            let statusCode = request.status;
             if (request.readyState !== 4) {
                 return;
             }
@@ -50,7 +49,15 @@ const connect = (url, data = {}, config = {}) => {
             ) {
                 result = JSON.parse(request.response);
             }
-            if (request.status >= 200 && request.status < 300) {
+
+            if (statusCode === 0) {
+                return setTimeout(() => {
+                    if (request['isTimeout'] === true) {
+                        request['isTimeout'] = false;
+                        reject({statusCode: 408, message: 'Timeout'})
+                    }
+                }, 1)
+            } else if (statusCode >= 200 && statusCode < 300) {
                 resolve({
                     data: result,
                     request: request,
@@ -60,7 +67,7 @@ const connect = (url, data = {}, config = {}) => {
                 reject({
                     data: result,
                     request: request,
-                    statusCode: request.status
+                    statusCode: request.status,
                 });
             }
         };
@@ -68,13 +75,6 @@ const connect = (url, data = {}, config = {}) => {
         Object.keys(init.headers).forEach(function (item) {
             request.setRequestHeader(item, init.headers[item]);
         });
-
-        if (init.timeout) {
-            request.ontimeout = function () {
-                const e = new Error('Connection timed out');
-                reject(e);
-            };
-        }
         request.send(body);
     });
 }
@@ -115,6 +115,12 @@ class connection {
         const defaultInit = {method: 'DELETE'};
         const init = initProps(defaultInit, config);
         return connect(url, init.data, init);
+    }
+
+    static setConfig(config) {
+        const defaultInit = {timeout: timeout};
+        const init = initProps(defaultInit, config);
+        if (init && init.timeout) timeout = init.timeout;
     }
 }
 
