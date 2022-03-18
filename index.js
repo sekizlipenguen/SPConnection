@@ -49,12 +49,13 @@ const connect = (url, data = {}, config = {}) => {
             ) {
                 result = JSON.parse(request.response);
             }
-
             if (statusCode === 0) {
                 return setTimeout(() => {
                     if (request['isTimeout'] === true) {
                         request['isTimeout'] = false;
-                        reject({statusCode: 408, message: 'Timeout'})
+                        reject({statusCode: 408, message: 'Timeout'});
+                    } else {
+                        reject({statusCode: 0, message: 'ERR_INTERNET_DISCONNECTED'});
                     }
                 }, 1)
             } else if (statusCode >= 200 && statusCode < 300) {
