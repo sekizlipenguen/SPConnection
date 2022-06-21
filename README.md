@@ -4,10 +4,11 @@
 
 > Promise based HTTP client for the browser and react, react-native
 
-### Release notes(0.1.0) 🐧 🐐
+### Release notes(0.1.2) 🐧 🐐
 
 - global setConfig method
 - response timeout(status code) 408 added
+- connectType default null - fetch (not progressbar)
 
 ## Installation
 
