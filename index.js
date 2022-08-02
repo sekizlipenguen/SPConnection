@@ -22,7 +22,6 @@ const connect = (url, data = {}, config = {}) => {
 
         const request = new XMLHttpRequest();
         request.open(init.method, url, init.async);
-        console.log('timeout11', init.timeout);
         if (init.timeout) {
             request.timeout = init.timeout;
         }
@@ -39,7 +38,6 @@ const connect = (url, data = {}, config = {}) => {
 
         request.onreadystatechange = (e) => {
             const responseHeaders = request && request.responseHeaders ? request.responseHeaders : null;
-            console.log('request', request);
             let statusCode = request.status;
             if (request.readyState !== 4) {
                 return;
@@ -57,7 +55,6 @@ const connect = (url, data = {}, config = {}) => {
                         request['isTimeout'] = false;
                         reject({statusCode: 408, message: 'Timeout'});
                     } else {
-                        console.log('timeout1', timeout);
                         reject({statusCode: 0, message: 'ERR_INTERNET_DISCONNECTED'});
                     }
                 }, 1)
