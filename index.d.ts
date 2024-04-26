@@ -1,3 +1,5 @@
+import {connection} from "@sekizlipenguen/connection";
+
 declare module "@sekizlipenguen/connection" {
     export interface Config {
         connectType?: string
@@ -14,3 +16,4 @@ declare module "@sekizlipenguen/connection" {
 
     export const connection: connection;
 }
+export default connection;
