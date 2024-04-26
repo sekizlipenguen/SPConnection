@@ -1,6 +1,6 @@
 {
   "name": "@sekizlipenguen/connection",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Promise based HTTP client for the browser and react, react-native",
   "main": "index.js",
   "types": "index.d.ts",
