@@ -8,11 +8,11 @@ declare module "@sekizlipenguen/connection" {
     }
 
     export interface connection {
-        get: (url: string, config: Config) => void,
-        post: (url: string, data?: object, config?: Config) => void,
-        put: (url: string, data?: object, config?: Config) => void,
-        patch: (url: string, data?: object, config?: Config) => void,
-        delete: (url: string, config: Config) => void,
+        get: (url: string, config: Config) => Promise<any>,
+        post: (url: string, data?: object, config?: Config) => Promise<any>,
+        put: (url: string, data?: object, config?: Config) => Promise<any>,
+        patch: (url: string, data?: object, config?: Config) => Promise<any>,
+        delete: (url: string, config: Config) => Promise<any>,
         setConfig: (config: Config) => void
     }
 
