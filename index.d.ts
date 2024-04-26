@@ -1,8 +1,10 @@
 import {connection} from "@sekizlipenguen/connection";
 
 declare module "@sekizlipenguen/connection" {
+
     export interface Config {
-        connectType?: string
+        connectType?: string,
+        headers?: object
     }
 
     export interface connection {
