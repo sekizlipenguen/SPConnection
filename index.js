@@ -34,7 +34,9 @@ const connect = (url, data = {}, config = {}) => {
         request.ontimeout = () => (request.isTimeout = true);
 
         request.onreadystatechange = () => {
-            if (request.readyState !== 4) return;
+            if (request.readyState !== 4) {
+                return;
+            }
 
             let result = request.response;
             const contentType = request.getResponseHeader('Content-Type');
@@ -66,14 +68,18 @@ const connect = (url, data = {}, config = {}) => {
 const connectFetch = (url, data = {}, config = {}) => {
     let then1 = {};
     let body = (isObject(data) || isArray(data)) && config.files !== true ? JSON.stringify(data) : data;
+
     const defaultInit = {method: 'GET', timeout, progress: null, headers: {}, async: true};
     const init = initProps(defaultInit, config);
-
     return new Promise((resolve, reject) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), init.timeout);
 
-        fetch(url, {...init, signal: controller.signal}).then((response) => {
+        fetch(url, {
+            ...init,
+            ...(init.method !== 'GET' ? {body} : {}), // Sadece GET dışında body eklenir
+            signal: controller.signal,
+        }).then((response) => {
             then1 = response;
             if (response.headers.get('content-type')?.includes('application/json')) {
                 return response.json();
@@ -135,8 +141,12 @@ class connection {
     static setConfig(config) {
         const defaultInit = {timeout, connectType};
         const init = initProps(defaultInit, config);
-        if (init.timeout) timeout = init.timeout;
-        if (init.connectType) connectType = init.connectType;
+        if (init.timeout) {
+            timeout = init.timeout;
+        }
+        if (init.connectType) {
+            connectType = init.connectType;
+        }
     }
 }
 
