@@ -1,98 +1,85 @@
 let timeout = 5000;
-let connectType = null; //fetch
-const initProps = (defaultInit, config) => {
-    return Object.assign({}, defaultInit, config);
-}
-const isObject = (v) => {
-    if (v) {
-        while (Object.prototype.toString.call(v) === '[object Object]') {
-            if ((v = Object.getPrototypeOf(v)) === null) {
-                return true;
-            }
-        }
+let connectType = null; // Varsayılan olarak 'fetch'
+
+const initProps = (defaultInit, config) => Object.assign({}, defaultInit, config);
+
+const isObject = (v) => v && Object.prototype.toString.call(v) === '[object Object]';
+const isArray = (v) => Array.isArray(v);
+
+const handleError = (error, reject) => {
+    if (error.statusCode === 408) {
+        reject({statusCode: 408, message: 'Timeout occurred'});
+    } else if (error.statusCode === 0) {
+        reject({statusCode: 0, message: 'Network disconnected'});
+    } else {
+        reject(error);
     }
-    return false;
-}
+};
 
 const connect = (url, data = {}, config = {}) => {
-    let body = (isObject(data) && config.files !== true) ? JSON.stringify(data) : data;
-    const defaultInit = {method: 'GET', timeout: timeout, progress: null, headers: {}, async: true};
+    let body = (isObject(data) || isArray(data)) && config.files !== true ? JSON.stringify(data) : data;
+    const defaultInit = {method: 'GET', timeout, progress: null, headers: {}, async: true};
     const init = initProps(defaultInit, config);
-    return new Promise((resolve, reject) => {
 
+    return new Promise((resolve, reject) => {
         const request = new XMLHttpRequest();
         request.open(init.method, url, init.async);
+
         if (init.timeout) {
             request.timeout = init.timeout;
         }
 
-        request.upload.addEventListener('progress', function (e) {
-            if (init.progress) {
-                return init.progress(e);
-            }
-        });
+        request.upload.addEventListener('progress', (e) => init.progress && init.progress(e));
 
-        request.ontimeout = function () {
-            request['isTimeout'] = true
-        }
+        request.ontimeout = () => (request.isTimeout = true);
 
-        request.onreadystatechange = (e) => {
-            const responseHeaders = request && request.responseHeaders ? request.responseHeaders : null;
-            let statusCode = request.status;
-            if (request.readyState !== 4) {
-                return;
-            }
+        request.onreadystatechange = () => {
+            if (request.readyState !== 4) return;
+
             let result = request.response;
-            if (
-                (responseHeaders && responseHeaders['Content-Type'] && responseHeaders['Content-Type'].match(/application\/json/)) ||
-                (request.getResponseHeader("Content-Type") && request.getResponseHeader("Content-Type").match(/application\/json/))
-            ) {
+            const contentType = request.getResponseHeader('Content-Type');
+            if (contentType && contentType.includes('application/json')) {
                 result = JSON.parse(request.response);
             }
-            if (statusCode === 0) {
-                return setTimeout(() => {
-                    if (request['isTimeout'] === true) {
-                        request['isTimeout'] = false;
-                        reject({statusCode: 408, message: 'Timeout'});
+
+            if (request.status === 0) {
+                setTimeout(() => {
+                    if (request.isTimeout) {
+                        request.isTimeout = false;
+                        handleError({statusCode: 408}, reject);
                     } else {
-                        reject({statusCode: 0, message: 'ERR_INTERNET_DISCONNECTED'});
+                        handleError({statusCode: 0}, reject);
                     }
-                }, 1)
-            } else if (statusCode >= 200 && statusCode < 300) {
-                resolve({
-                    data: result,
-                    request: request,
-                    statusCode: request.status
-                });
+                }, 1);
+            } else if (request.status >= 200 && request.status < 300) {
+                resolve({data: result, request, statusCode: request.status});
             } else {
-                reject({
-                    data: result,
-                    request: request,
-                    statusCode: request.status,
-                });
+                reject({data: result, request, statusCode: request.status});
             }
         };
 
-        Object.keys(init.headers).forEach(function (item) {
-            request.setRequestHeader(item, init.headers[item]);
-        });
+        Object.keys(init.headers).forEach((key) => request.setRequestHeader(key, init.headers[key]));
         request.send(body);
     });
-}
+};
 
 const connectFetch = (url, data = {}, config = {}) => {
     let then1 = {};
-    let body = (isObject(data) && config.files !== true) ? JSON.stringify(data) : data;
-    const defaultInit = {method: 'GET', timeout: timeout, progress: null, headers: {}, async: true};
+    let body = (isObject(data) || isArray(data)) && config.files !== true ? JSON.stringify(data) : data;
+    const defaultInit = {method: 'GET', timeout, progress: null, headers: {}, async: true};
     const init = initProps(defaultInit, config);
+
     return new Promise((resolve, reject) => {
-        fetch(url, init).then((response) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), init.timeout);
+
+        fetch(url, {...init, signal: controller.signal}).then((response) => {
             then1 = response;
-            if (response.headers.get('content-type') && response.headers.get('content-type').match(/application\/json/)) {
+            if (response.headers.get('content-type')?.includes('application/json')) {
                 return response.json();
             }
             return response;
-        }).then(res2 => {
+        }).then((res2) => {
             const then2 = {data: res2};
             const result = Object.assign({}, then2, then1, {config: init});
             if (then1.ok) {
@@ -100,60 +87,56 @@ const connectFetch = (url, data = {}, config = {}) => {
             } else {
                 reject(result);
             }
-        }).catch(err => reject(err));
-
-        if (init && init.timeout) {
-            const e = new Error('Connection timed out');
-            setTimeout(reject, init.timeout, e);
-        }
-    })
-
-}
+        }).catch((err) => reject(err)).finally(() => clearTimeout(timeoutId));
+    });
+};
 
 class connection {
-
     static get(url, config) {
-        const defaultInit = {method: 'GET', connectType: connectType};
+        const defaultInit = {method: 'GET', connectType};
         const init = initProps(defaultInit, config);
-        return init.connectType && init.connectType === 'fetch' ? connectFetch(url, init.data, init) : connect(url, init.data, init);
+        return init.connectType === 'fetch'
+            ? connectFetch(url, init.data, init)
+            : connect(url, init.data, init);
     }
 
     static post(url, data, config) {
-        const isData = typeof data;
-        const body = isData === 'object' ? JSON.stringify(data) : data;
-        const defaultInit = {method: 'POST', body: body, connectType: connectType};
+        const defaultInit = {method: 'POST', connectType};
         const init = initProps(defaultInit, config);
-        return connect(url, data, init);
+        return init.connectType === 'fetch'
+            ? connectFetch(url, data, init)
+            : connect(url, data, init);
     }
 
     static put(url, data, config) {
-        const isData = typeof data;
-        const body = isData === 'object' ? JSON.stringify(data) : data;
-        const defaultInit = {method: 'PUT', body: body, connectType: connectType};
+        const defaultInit = {method: 'PUT', connectType};
         const init = initProps(defaultInit, config);
-        return connect(url, data, init);
+        return init.connectType === 'fetch'
+            ? connectFetch(url, data, init)
+            : connect(url, data, init);
     }
 
     static patch(url, data, config) {
-        const isData = typeof data;
-        const body = isData === 'object' ? JSON.stringify(data) : data;
-        const defaultInit = {method: 'PATCH', body: body, connectType: connectType};
+        const defaultInit = {method: 'PATCH', connectType};
         const init = initProps(defaultInit, config);
-        return connect(url, data, init);
+        return init.connectType === 'fetch'
+            ? connectFetch(url, data, init)
+            : connect(url, data, init);
     }
 
     static delete(url, config) {
-        const defaultInit = {method: 'DELETE', connectType: connectType};
+        const defaultInit = {method: 'DELETE', connectType};
         const init = initProps(defaultInit, config);
-        return connect(url, init.data, init);
+        return init.connectType === 'fetch'
+            ? connectFetch(url, init.data, init)
+            : connect(url, init.data, init);
     }
 
     static setConfig(config) {
-        const defaultInit = {timeout: timeout, connectType: connectType};
+        const defaultInit = {timeout, connectType};
         const init = initProps(defaultInit, config);
-        if (init && init.timeout) timeout = init.timeout;
-        if (init && init.connectType) connectType = init.connectType;
-
+        if (init.timeout) timeout = init.timeout;
+        if (init.connectType) connectType = init.connectType;
     }
 }
 
