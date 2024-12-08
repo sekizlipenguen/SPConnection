@@ -81,8 +81,13 @@ const connectFetch = (url, data = {}, config = {}) => {
             signal: controller.signal,
         }).then((response) => {
             then1 = response;
-            if (response.headers.get('content-type')?.includes('application/json')) {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
                 return response.json();
+            } else if (contentType.includes('text/')) {
+                return response.text();
+            } else if (contentType.includes('application/octet-stream')) {
+                return response.blob();
             }
             return response;
         }).then((res2) => {
@@ -98,44 +103,32 @@ const connectFetch = (url, data = {}, config = {}) => {
 };
 
 class connection {
-    static get(url, config) {
-        const defaultInit = {method: 'GET', connectType};
+    static request(method, url, data = {}, config = {}) {
+        const defaultInit = {method, connectType};
         const init = initProps(defaultInit, config);
         return init.connectType === 'fetch'
-            ? connectFetch(url, init.data, init)
-            : connect(url, init.data, init);
+            ? connectFetch(url, data, init)
+            : connect(url, data, init);
+    }
+
+    static get(url, config) {
+        return this.request('GET', url, undefined, config);
     }
 
     static post(url, data, config) {
-        const defaultInit = {method: 'POST', connectType};
-        const init = initProps(defaultInit, config);
-        return init.connectType === 'fetch'
-            ? connectFetch(url, data, init)
-            : connect(url, data, init);
+        return this.request('POST', url, data, config);
     }
 
     static put(url, data, config) {
-        const defaultInit = {method: 'PUT', connectType};
-        const init = initProps(defaultInit, config);
-        return init.connectType === 'fetch'
-            ? connectFetch(url, data, init)
-            : connect(url, data, init);
+        return this.request('PUT', url, data, config);
     }
 
     static patch(url, data, config) {
-        const defaultInit = {method: 'PATCH', connectType};
-        const init = initProps(defaultInit, config);
-        return init.connectType === 'fetch'
-            ? connectFetch(url, data, init)
-            : connect(url, data, init);
+        return this.request('PATCH', url, data, config);
     }
 
     static delete(url, config) {
-        const defaultInit = {method: 'DELETE', connectType};
-        const init = initProps(defaultInit, config);
-        return init.connectType === 'fetch'
-            ? connectFetch(url, init.data, init)
-            : connect(url, init.data, init);
+        return this.request('DELETE', url, undefined, config);
     }
 
     static setConfig(config) {
