@@ -1,5 +1,5 @@
 let timeout = 5000;
-let connectType = null; // Varsayılan olarak 'fetch'
+let connectType = 'fetch'; // Varsayılan olarak 'fetch'
 
 const initProps = (defaultInit, config) => Object.assign({}, defaultInit, config);
 
