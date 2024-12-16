@@ -127,8 +127,8 @@ class connection {
         return this.request('PATCH', url, data, config);
     }
 
-    static delete(url, config) {
-        return this.request('DELETE', url, undefined, config);
+    static delete(url, data, config) {
+        return this.request('DELETE', url, data, config);
     }
 
     static setConfig(config) {

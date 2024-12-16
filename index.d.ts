@@ -19,7 +19,7 @@ declare module "@sekizlipenguen/connection" {
         post: <T = any>(url: string, data?: object, config?: Config) => Promise<ReturnTypeConfig<T>>;
         put: <T = any>(url: string, data?: object, config?: Config) => Promise<ReturnTypeConfig<T>>;
         patch: <T = any>(url: string, data?: object, config?: Config) => Promise<ReturnTypeConfig<T>>;
-        delete: <T = any>(url: string, config?: Config) => Promise<ReturnTypeConfig<T>>;
+        delete: <T = any>(url: string, data?: object, config?: Config) => Promise<ReturnTypeConfig<T>>;
         setConfig: (config: Config) => void;
     }
 
