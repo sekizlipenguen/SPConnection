@@ -1,94 +1,184 @@
-![platforms](https://img.shields.io/badge/platforms-Android%20%7C%20iOS-brightgreen.svg?style=flat-square&colorB=191A17)
+![platforms](https://img.shields.io/badge/platforms-Web%20%7C%20Android%20%7C%20iOS-brightgreen.svg?style=flat-square&colorB=191A17)
 [![npm](https://img.shields.io/npm/v/@sekizlipenguen/connection.svg?style=flat-square)](https://www.npmjs.com/package/@sekizlipenguen/connection)
 [![npm](https://img.shields.io/npm/dm/@sekizlipenguen/connection.svg?style=flat-square&colorB=007ec6)](https://www.npmjs.com/package/@sekizlipenguen/connection)
 
-> Promise based HTTP client for the browser and react, react-native
+# @sekizlipenguen/connection
 
-### Release notes(0.1.2) 🐧 🐐
+A powerful and customizable HTTP client for React Native, React, and Web. This library supports Android, iOS, and Web, providing a seamless experience for handling API requests.
 
-- global setConfig method
-- response timeout(status code) 408 added
-- connectType default null - fetch (not progressbar)
+---
 
 ## Installation
 
-```
-yarn add @sekizlipenguen/connection
-or
+Install the library using `npm` or `yarn`:
+
+```bash
 npm install @sekizlipenguen/connection
 ```
 
-### Performing a `GET` request
+```bash
+yarn add @sekizlipenguen/connection
+```
 
-```js
+---
 
+## Features
+
+- Supports both `fetch` and `XMLHttpRequest` (XHR) as connection types.
+- Global configuration for timeout and headers.
+- Event-driven progress handling for uploads.
+- Fully compatible with React Native 0.60+ and Web.
+- Lightweight and easy to use.
+
+---
+
+## Usage
+
+### Basic Example (GET Request)
+
+```javascript
 import connection from "@sekizlipenguen/connection";
-//or const connection = require('@sekizlipenguen/connection');
 
-connection.get('https://mocki.io/v1/8cecbd39-4cde-448f-9149-bccae2b66a0c').then((response) => {
-    console.log(response);
+// GET request example
+connection.get("https://example.com/api/data").then((response) => {
+  console.log(response.data);
 }).catch((error) => {
-    console.log(error);
+  console.error(error);
 });
 
-//example `async`
-async function getPenguin() {
+// Using async/await
+async function fetchData() {
+  try {
+    const response = await connection.get("https://example.com/api/data");
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+fetchData();
+```
+
+### POST Request Example
+
+```javascript
+connection.post("https://example.com/api/data", {
+  firstName: "John",
+  lastName: "Doe",
+}).then((response) => {
+  console.log(response.data);
+}).catch((error) => {
+  console.error(error);
+});
+```
+
+---
+
+## API Methods
+
+| Method   | Description            |
+|----------|------------------------|
+| `get`    | Sends a GET request    |
+| `post`   | Sends a POST request   |
+| `put`    | Sends a PUT request    |
+| `patch`  | Sends a PATCH request  |
+| `delete` | Sends a DELETE request |
+
+Each method accepts the following parameters:
+
+- `url`: The API endpoint.
+- `data` (optional): The payload for POST, PUT, PATCH requests.
+- `config` (optional): Configuration object (e.g., headers, timeout).
+
+---
+
+## Global Configuration
+
+You can set global configurations such as timeout and headers using `setConfig`.
+
+```javascript
+connection.setConfig({
+  timeout: 10000, // 10 seconds
+  headers: {
+    "Authorization": "Bearer token",
+    "Content-Type": "application/json",
+  },
+});
+```
+
+---
+
+## Config Options
+
+| Option        | Type                     | Default   | Description                              |
+|---------------|--------------------------|-----------|------------------------------------------|
+| `connectType` | `'fetch'                 | 'xhr'`    | `'fetch'`                                | The connection type to use.                     |
+| `headers`     | `Record<string, any>`    | `{}`      | HTTP headers for the request.            |
+| `timeout`     | `number`                 | `5000` ms | Request timeout in milliseconds.         |
+| `progress`    | `(event: ProgressEvent)` | `null`    | Upload progress callback (for XHR only). |
+
+---
+
+## Advanced Example
+
+### Custom Headers and Timeout
+
+```javascript
+connection.get("https://example.com/api/data", {
+  headers: {
+    "Authorization": "Bearer token",
+  },
+  timeout: 10000, // 10 seconds
+});
+```
+
+### Handling Progress Events (File Upload)
+
+```javascript
+connection.post("https://example.com/api/upload", fileData, {
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+  progress: (event) => {
+    const percentCompleted = Math.round((event.loaded * 100) / event.total);
+    console.log(`Upload progress: ${percentCompleted}%`);
+  },
+});
+```
+
+---
+
+## TypeScript Support
+
+This library provides TypeScript definitions for better type safety and autocompletion.
+
+### Example
+
+```typescript
+import connection, {Config, ReturnTypeConfig} from "@sekizlipenguen/connection";
+
+const config: Config = {
+    headers: {
+        "Authorization": "Bearer token",
+    },
+    timeout: 10000,
+};
+
+async function fetchData() {
     try {
-        const response = await connection.get('https://penguin.example.com?p=1&d=1');
-        console.log(response);
+        const response: ReturnTypeConfig = await connection.get("https://example.com/api/data", config);
+        console.log(response.data);
     } catch (error) {
         console.error(error);
     }
 }
 
+fetchData();
 ```
 
-### Performing a `POST` request
+---
 
-```js
+## License
 
-connection.post('https://mocki.io/v1/8cecbd39-4cde-448f-9149-bccae2b66a0c', {
-    first_name: 'CM',
-    last_name: 'Penguen'
-}).then((response) => {
-    console.log(response);
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
-}).catch((error) => {
-    console.log(error);
-});
-
-```
-
-### Methods
-
-| Method Name              | Description |
-|--------------------------|-------------|
-| get(url,config)          |             |
-| post(url,data, config)   |             |
-| put(url, data, config)   |             |
-| patch(url, data, config) |             |
-| delete(url, config)      |             |
-
-### Global Config
-
-```js
-connection.setConfig({
-    timeout: 6000 //ms
-})
-```
-
-### Config
-
-```object
-{
-    headers: {
-        "content-type": "application/json",
-        "X-Custom-Header": "foobar"
-    },
-    progress: function (e) {
-        //post-put data upload event
-    },
-    timeout: "default 5000 ms",
-    async:"default true"
-}
-```

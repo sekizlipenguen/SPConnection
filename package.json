@@ -1,7 +1,7 @@
 {
   "name": "@sekizlipenguen/connection",
-  "version": "0.2.1",
-  "description": "Promise based HTTP client for the browser and react, react-native",
+  "version": "0.2.2",
+  "description": "A lightweight and promise-based HTTP client for React Native, React, and Web applications. Supports fetch and XMLHttpRequest with advanced configuration options.",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
@@ -13,20 +13,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sekizlipenguen/SPConnection.git"
+    "url": "https://github.com/sekizlipenguen/SPConnection.git"
   },
   "keywords": [
-    "xhr",
-    "http",
+    "http client",
     "ajax",
-    "promise",
-    "node",
-    "axios",
-    "axios lite",
+    "fetch",
+    "xhr",
     "XMLHttpRequest",
-    "connection",
-    "react native ajax",
-    "react ajax"
+    "http requests",
+    "promise-based HTTP client",
+    "react",
+    "react-native",
+    "web",
+    "connection library",
+    "axios alternative",
+    "lightweight http client",
+    "react native http",
+    "api client",
+    "network requests"
   ],
   "author": "SekizliPenguen",
   "license": "MIT",
@@ -36,5 +41,5 @@
   "bugs": {
     "url": "https://github.com/sekizlipenguen/SPConnection/issues"
   },
-  "homepage": "https://github.com/sekizlipenguen/SPConnection/#readme"
+  "homepage": "https://github.com/sekizlipenguen/SPConnection#readme"
 }
