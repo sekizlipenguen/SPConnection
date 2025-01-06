@@ -1,6 +1,6 @@
 {
   "name": "@sekizlipenguen/connection",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A lightweight and promise-based HTTP client for React Native, React, and Web applications. Supports fetch and XMLHttpRequest with advanced configuration options.",
   "main": "index.js",
   "types": "index.d.ts",

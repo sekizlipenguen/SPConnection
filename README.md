@@ -29,6 +29,7 @@ yarn add @sekizlipenguen/connection
 - Event-driven progress handling for uploads.
 - Fully compatible with React Native 0.60+ and Web.
 - Lightweight and easy to use.
+- Logging functionality for debugging (optional).
 
 ---
 
@@ -112,10 +113,11 @@ connection.setConfig({
 
 | Option        | Type                     | Default   | Description                              |
 |---------------|--------------------------|-----------|------------------------------------------|
-| `connectType` | `'fetch'                 | 'xhr'`    | `'fetch'`                                | The connection type to use.                     |
+| `connectType` | `'fetch'` \| `'xhr'`     | `'fetch'` | The connection type to use.              |
 | `headers`     | `Record<string, any>`    | `{}`      | HTTP headers for the request.            |
 | `timeout`     | `number`                 | `5000` ms | Request timeout in milliseconds.         |
 | `progress`    | `(event: ProgressEvent)` | `null`    | Upload progress callback (for XHR only). |
+| `logEnabled`  | `boolean`                | `false`   | Enable or disable logging for debugging. |
 
 ---
 
@@ -144,6 +146,13 @@ connection.post("https://example.com/api/upload", fileData, {
     console.log(`Upload progress: ${percentCompleted}%`);
   },
 });
+```
+
+### Enabling Logging
+
+```javascript
+connection.enableLogs(true); // Enable logging
+connection.enableLogs(false); // Disable logging
 ```
 
 ---
@@ -181,4 +190,3 @@ fetchData();
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
-

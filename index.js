@@ -1,10 +1,17 @@
 let timeout = 5000;
 let connectType = 'fetch'; // Varsayılan olarak 'fetch'
+let logEnabled = false; // Loglama durumu (varsayılan: false)
 
 const initProps = (defaultInit, config) => Object.assign({}, defaultInit, config);
 
 const isObject = (v) => v && Object.prototype.toString.call(v) === '[object Object]';
 const isArray = (v) => Array.isArray(v);
+
+const log = (...args) => {
+    if (logEnabled) {
+        console.info('[Connection Log]:', ...args);
+    }
+};
 
 const handleError = (error, reject) => {
     if (error.statusCode === 408) {
@@ -17,6 +24,8 @@ const handleError = (error, reject) => {
 };
 
 const connect = (url, data = {}, config = {}) => {
+    log('XHR Connect Start:', {url, data, config});
+
     let body = (isObject(data) || isArray(data)) && config.files !== true ? JSON.stringify(data) : data;
     const defaultInit = {method: 'GET', timeout, progress: null, headers: {}, async: true};
     const init = initProps(defaultInit, config);
@@ -54,8 +63,10 @@ const connect = (url, data = {}, config = {}) => {
                     }
                 }, 1);
             } else if (request.status >= 200 && request.status < 300) {
+                log('XHR Connect Success:', {result});
                 resolve({data: result, request, statusCode: request.status});
             } else {
+                log('XHR Connect Error:', {status: request.status, response: result});
                 reject({data: result, request, statusCode: request.status});
             }
         };
@@ -66,6 +77,8 @@ const connect = (url, data = {}, config = {}) => {
 };
 
 const connectFetch = (url, data = {}, config = {}) => {
+    log('Fetch Connect Start:', {url, data, config});
+
     let then1 = {};
     let body = (isObject(data) || isArray(data)) && config.files !== true ? JSON.stringify(data) : data;
 
@@ -94,11 +107,16 @@ const connectFetch = (url, data = {}, config = {}) => {
             const then2 = {data: res2};
             const result = Object.assign({}, then2, then1, {config: init});
             if (then1.ok) {
+                log('Fetch Connect Success:', {result});
                 resolve(result);
             } else {
+                log('Fetch Connect Error:', {status: then1.status, response: res2});
                 reject(result);
             }
-        }).catch((err) => reject(err)).finally(() => clearTimeout(timeoutId));
+        }).catch((err) => {
+            log('Fetch Connect Catch Error:', err);
+            reject(err);
+        }).finally(() => clearTimeout(timeoutId));
     });
 };
 
@@ -140,6 +158,11 @@ class connection {
         if (init.connectType) {
             connectType = init.connectType;
         }
+    }
+
+    static enableLogs(enable) {
+        logEnabled = enable;
+        log('Logging enabled:', enable);
     }
 }
 

@@ -21,9 +21,10 @@ declare module "@sekizlipenguen/connection" {
         patch: <T = any>(url: string, data?: object, config?: Config) => Promise<ReturnTypeConfig<T>>;
         delete: <T = any>(url: string, data?: object, config?: Config) => Promise<ReturnTypeConfig<T>>;
         setConfig: (config: Config) => void;
+        enableLogs: (enable: boolean) => void; // Loglama özelliğini etkinleştirme veya devre dışı bırakma
     }
 
     export const connection: connection;
 }
-export default connection;
 
+export default connection;
