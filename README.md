@@ -4,7 +4,8 @@
 
 # @sekizlipenguen/connection
 
-A powerful and customizable HTTP client for React Native, React, and Web. This library supports Android, iOS, and Web, providing a seamless experience for handling API requests.
+A powerful and customizable HTTP client designed for simplicity and flexibility in React Native, React, and Web environments. This library was created to address common challenges in RESTful API integrations, providing support for both `fetch` and `XMLHttpRequest` (XHR) as connection types. It includes features like upload progress tracking and a lightweight minified version (~5KB) for optimal performance. Perfect for handling both basic and advanced API needs, including file uploads, custom headers, and timeout management. With built-in logging, you can easily debug and monitor network
+requests, ensuring a seamless developer experience. Additionally, we have added the ability to toggle debug mode for React Native, allowing developers to easily activate or deactivate network monitoring, helping to address challenges in observing network activities during development.
 
 ---
 
